@@ -1,27 +1,32 @@
 import pygame, random, os
 
 pygame.init()
-tamanho = (800,600)
+tamanho = (900,500)
 relogio = pygame.time.Clock()
 tela = pygame.display.set_mode(tamanho)
 pygame.display.set_caption("Iron Man")
 icone = pygame.image.load("assets/icon.png")
 pygame.display.set_icon(icone)
 
-# Chamando os assets
-iron = pygame.image.load("assets/iron.png")
+# Chamando os assets ---------------------------------------------------
+
+# imagens:
+stelle = pygame.image.load("assetsHSR/stellePlayer.png")
 fundo = pygame.image.load("assets/fundo.png")
 #fundoStart = pygame.image.load("assets/")
-missel = pygame.image.load("assets/missile.png")
+birdskull = pygame.image.load("assetsHSR/Birdskull.png")
 
+# Fontes:
 fonte = pygame.font.SysFont("comicsans",20)
 fonteMorte = pygame.font.SysFont("arial", 100)
 
+# Sons:
 pygame.mixer.music.load("assets/ironsound.mp3")
 misselSom = pygame.mixer.Sound("assets/missile.wav")
 explosaoSom = pygame.mixer.Sound("assets/explosao.wav")
+# -----------------------------------------------------------------------
 
-
+# Cores:
 branco = (255,255,255)
 preto = (0,0,0)
 
@@ -86,20 +91,19 @@ def jogar():
 
         tela.fill(branco)
         tela.blit(fundo, (0,0)) # Botando a imagem de fundo
-        tela.blit(iron,(posicaoXpersona,posicaoYpersona)) # Botando o IronMan
+        tela.blit(stelle,(posicaoXpersona,posicaoYpersona)) # Botando o IronMan
 
         # Config do Missel:
         posicaoYmissel = posicaoYmissel + velocidadeMissel # Configura o missel caindo e a velocidade 
         if posicaoYmissel > 600:
             posicaoYmissel = -240
             posicaoXmissel = random.randint(0,800)
-            velocidadeMissel = velocidadeMissel + 1
             pygame.mixer.Sound.play(misselSom)
             pontos = pontos + 1
 
-        tela.blit(missel, (posicaoXmissel, posicaoYmissel)) # Mostra o missel
+        tela.blit(birdskull, (posicaoXmissel, posicaoYmissel)) # Mostra o missel
 
-        # Mostra as coordenadas do IronMan
+        # Mostra aos pontos
         texto = fonte.render("Pontos:" + str(pontos), True, branco)
         tela.blit(texto,(10,10))
 
@@ -109,14 +113,14 @@ def jogar():
         pixelMisselY = list(range(posicaoYmissel, posicaoYmissel + alturaMissel))
 
         os.system('cls')
-        print( len( list( set(pixelMisselY).intersection(set(pixelsPersonaY) ) ) ) )
+        #print( len( list( set(pixelMisselY).intersection(set(pixelsPersonaY) ) ) ) )
         if len( list( set( pixelMisselY).intersection (set(pixelsPersonaY)))) > dificuldade:
             if len ( list ( set(pixelMisselX).intersection(set(pixelsPersonaX) ) ) ) > dificuldade:
                 dead()
-            else:
-                print("Ainda vivo, mas por pouco!")
-        else:
-            print("Ainda vivo")
+            #else:
+                #print("Ainda vivo, mas por pouco!")
+        #else:
+            #print("Ainda vivo")
 
         pygame.display.update()
         relogio.tick(60)
