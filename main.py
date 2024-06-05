@@ -1,20 +1,22 @@
 import pygame, random, os
 
 pygame.init()
-tamanho = (900,500)
+
+tamanho = (1200,673)
 relogio = pygame.time.Clock()
 tela = pygame.display.set_mode(tamanho)
-pygame.display.set_caption("Iron Man")
-icone = pygame.image.load("assets/icon.png")
+icone = pygame.image.load("assetsHSR/stellePlayerRE.png")
 pygame.display.set_icon(icone)
+pygame.display.set_caption("Iron Man")
 
 # Chamando os assets ---------------------------------------------------
 
 # imagens:
-stelle = pygame.image.load("assetsHSR/stellePlayer.png")
-fundo = pygame.image.load("assets/fundo.png")
+fundo = pygame.image.load("assetsHSR/fundoRE.png")
 #fundoStart = pygame.image.load("assets/")
-birdskull = pygame.image.load("assetsHSR/Birdskull.png")
+stelle = pygame.image.load("assetsHSR/stellePlayerRE.png")
+birdskull = pygame.image.load("assetsHSR/BirdskullRE.png")
+memeAllSeer = pygame.image.load("assetsHSR/MemeAllseerRE.png")
 
 # Fontes:
 fonte = pygame.font.SysFont("comicsans",20)
@@ -25,30 +27,37 @@ pygame.mixer.music.load("assets/ironsound.mp3")
 misselSom = pygame.mixer.Sound("assets/missile.wav")
 explosaoSom = pygame.mixer.Sound("assets/explosao.wav")
 # -----------------------------------------------------------------------
-
+bordaX = 1200
+bordaY = 673
 # Cores:
 branco = (255,255,255)
 preto = (0,0,0)
 
 def jogar():
 
-    pygame.mixer.music.play(-1) # Botando a musica pra tocar / -1 para tocar em loop
-    pygame.mixer.Sound.play(misselSom) # Tocando o som do missel 1vez ja q ele ja começa caindo
+    #pygame.mixer.music.play(-1) # Botando a musica pra tocar / -1 para tocar em loop
+    #pygame.mixer.Sound.play(misselSom) # Tocando o som do missel 1vez ja q ele ja começa caindo
 
-    posicaoXpersona = 400
+    posicaoXpersona = 500
     posicaoYpersona = 300
     movimentoXpersona = 0
     movimentoYpersona = 0
-    larguraPersona = 250
-    alturaPersona = 127
+    larguraPersona = 150
+    alturaPersona = 150
 
-    posicaoXmissel = 400
-    posicaoYmissel = -240
-    velocidadeMissel = 5
-    alturaMissel = 150
-    larguraMissel = 50
+    posicaoXbird = 700
+    posicaoYbird = -240
+    velBird = 5
+    alturaBird = 162
+    larguraBird = 200
 
-    dificuldade = 20
+    posicaoYmeme1 = -163
+    posicaoXmeme1 = 400
+    alturaMeme1 = 102
+    larguraMeme1 = 100
+    velMeme1 = 10
+
+    dificuldade = 30
     pontos = 0
 
     while True:
@@ -74,54 +83,69 @@ def jogar():
             elif evento.type == pygame.KEYUP and evento.key == pygame.K_DOWN:
                 movimentoYpersona = 0
         
-        # Faz o movimento acontecer:
         posicaoXpersona = posicaoXpersona + movimentoXpersona  
         posicaoYpersona = posicaoYpersona + movimentoYpersona
         
-        # Para o boneco n sair da tela:
-        if posicaoXpersona < 0:
-            posicaoXpersona = 10
-        elif posicaoXpersona > 550:
-            posicaoXpersona = 540
+        # Config colisão com as bordas:
+        if posicaoXpersona < (bordaX - bordaX) - 30:
+            posicaoXpersona = - 20
+        elif posicaoXpersona > bordaX - 130 :
+            posicaoXpersona = bordaX - 140
         
-        elif posicaoYpersona < 0:
-            posicaoYpersona = 10
-        elif posicaoYpersona > 473:
-            posicaoYpersona = 463
+        #elif posicaoYpersona < 0:
+        #    posicaoYpersona = 10
+        #elif posicaoYpersona > 473:
+        #    posicaoYpersona = 463
 
         tela.fill(branco)
-        tela.blit(fundo, (0,0)) # Botando a imagem de fundo
-        tela.blit(stelle,(posicaoXpersona,posicaoYpersona)) # Botando o IronMan
+        tela.blit(fundo, (0,0))
+        tela.blit(stelle,(posicaoXpersona,posicaoYpersona))
 
-        # Config do Missel:
-        posicaoYmissel = posicaoYmissel + velocidadeMissel # Configura o missel caindo e a velocidade 
-        if posicaoYmissel > 600:
-            posicaoYmissel = -240
-            posicaoXmissel = random.randint(0,800)
-            pygame.mixer.Sound.play(misselSom)
+
+        # Config movimento inimigo ------------------------------
+        posicaoYbird = posicaoYbird + velBird # Configura o missel caindo e a velocidade 
+        if posicaoYbird > 600:
+            posicaoYbird = - alturaBird
+            posicaoXbird = random.randint(0,1000)
+            #pygame.mixer.Sound.play(misselSom)
             pontos = pontos + 1
+        tela.blit(birdskull, (posicaoXbird, posicaoYbird)) # Mostra o missel
 
-        tela.blit(birdskull, (posicaoXmissel, posicaoYmissel)) # Mostra o missel
+        posicaoYmeme1 = posicaoYmeme1 + velMeme1
+        if posicaoYmeme1 > 600:
+            posicaoYmeme1 = - alturaMeme1
+            posicaoXmeme1 = random.randint(0,1200)
+            pontos = pontos + 1
+        tela.blit(memeAllSeer, (posicaoXmeme1, posicaoYmeme1))        
 
         # Mostra aos pontos
         texto = fonte.render("Pontos:" + str(pontos), True, branco)
         tela.blit(texto,(10,10))
+        # -------------------------------------------------------
 
+
+        # Config colisao -------------------------------------------
         pixelsPersonaX = list(range(posicaoXpersona, posicaoXpersona + larguraPersona))
         pixelsPersonaY = list(range(posicaoYpersona, posicaoXpersona + alturaPersona))
-        pixelMisselX = list(range(posicaoXmissel, posicaoXmissel + larguraMissel))
-        pixelMisselY = list(range(posicaoYmissel, posicaoYmissel + alturaMissel))
+        pixelBirdX = list(range(posicaoXbird, posicaoXbird + larguraBird))
+        pixelBirdY = list(range(posicaoYbird, posicaoYbird + alturaBird))
+        pixelMeme1X = list(range(posicaoXmeme1, posicaoXmeme1 + larguraMeme1))
+        pixelMeme1Y = list(range(posicaoYmeme1, posicaoYmeme1 + alturaMeme1))
+
 
         os.system('cls')
         #print( len( list( set(pixelMisselY).intersection(set(pixelsPersonaY) ) ) ) )
-        if len( list( set( pixelMisselY).intersection (set(pixelsPersonaY)))) > dificuldade:
-            if len ( list ( set(pixelMisselX).intersection(set(pixelsPersonaX) ) ) ) > dificuldade:
+        if len( list( set( pixelBirdY).intersection (set(pixelsPersonaY)))) > dificuldade:
+            if len ( list ( set(pixelBirdX).intersection(set(pixelsPersonaX) ) ) ) > dificuldade:
                 dead()
             #else:
                 #print("Ainda vivo, mas por pouco!")
+        elif len( list( set( pixelMeme1Y).intersection (set(pixelsPersonaY)))) > dificuldade:
+            if len ( list ( set(pixelMeme1X).intersection(set(pixelsPersonaX) ) ) ) > dificuldade:
+                dead()
         #else:
             #print("Ainda vivo")
-
+        # ------------------------------------------------------------------
         pygame.display.update()
         relogio.tick(60)
 
