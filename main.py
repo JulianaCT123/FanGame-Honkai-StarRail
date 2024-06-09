@@ -1,4 +1,4 @@
-import pygame, random, os, time
+import pygame, random
 from tkinter import simpledialog
 
 import pygame.rect
@@ -57,10 +57,12 @@ def jogar(nome):
     posicaoYbird = -162
     velBird = 5
     alturaBird = 162
+    larguraBird = 200
 
     posicaoYmeme1 = -163
     posicaoXmeme1 = 400
     alturaMeme1 = 102
+    larguraMeme1 = 100
     velMeme1 = 10
 
     pontos = 0
@@ -99,7 +101,7 @@ def jogar(nome):
         posicaoYbird = posicaoYbird + velBird # Configura o inimigo caindo 
         if posicaoYbird > bordaY:
             posicaoYbird = - alturaBird
-            posicaoXbird = random.randint(0,bordaX)
+            posicaoXbird = random.randint(0,(bordaX - larguraBird))
             pontos = pontos + 1
         tela.blit(birdskull, (posicaoXbird, posicaoYbird)) # Mostra o inimigo 
         birdBoxFace = pygame.Rect((posicaoXbird + 78, posicaoYbird + 85, 43, 60))
@@ -113,7 +115,7 @@ def jogar(nome):
         posicaoYmeme1 = posicaoYmeme1 + velMeme1
         if posicaoYmeme1 > bordaY:
             posicaoYmeme1 = - alturaMeme1
-            posicaoXmeme1 = random.randint(0,bordaX)
+            posicaoXmeme1 = random.randint(0,(bordaX - larguraMeme1))
             pontos = pontos + 1
         tela.blit(memeAllSeer, (posicaoXmeme1, posicaoYmeme1))
         meme1Box = pygame.Rect((posicaoXmeme1 + 15,posicaoYmeme1 + 15,75,75))
@@ -163,8 +165,12 @@ def dead(nome, pontos):
                     #print(evento.pos)
                     if botaoJogar.collidepoint(evento.pos):
                         jogar(nome)
+                    elif botaoVoltar.collidepoint(evento.pos):
+                        menu(nome)
                 elif evento.type == pygame.KEYDOWN and evento.key == pygame.K_RETURN:
                     jogar(nome)
+                elif evento.type == pygame.KEYDOWN and evento.key == pygame.K_ESCAPE:
+                    menu(nome)
             
             tela.fill(preto)
             textoTitulo = fonteTitulo.render("Você Morreu :(", True, branco)
@@ -175,6 +181,9 @@ def dead(nome, pontos):
             textoEnter = fonteMiuda.render("ENTER para tentar novamente", True, branco)
             tela.blit(textoEnter, (110,450))
             tela.blit(stelleMorreu, (600,150))
+            botaoVoltar = pygame.draw.rect(tela, branco, (5,615,130,50),0,20)
+            textoVoltar = fonte.render("Voltar", True, preto)
+            tela.blit(textoVoltar,(12,605))
             
             pygame.display.update()
             relogio.tick(60)
@@ -187,10 +196,12 @@ def menu(nome):
                     quit()
                 elif evento.type == pygame.MOUSEBUTTONDOWN:
                     #print(evento.pos)
+                    
                     if botaoJogar.collidepoint(evento.pos):
                         jogar(nome)
-                    elif botaoRank.collidepoint(evento.pos):
-                        rank(nome)
+                    if nome != "Anonimo":
+                        if botaoRank.collidepoint(evento.pos):
+                            rank(nome)
                     elif botaoUser.collidepoint(evento.pos):
                         nome = simpledialog.askstring("Bem-Vindo à Penacony!", "Insira um username: ")
 
@@ -227,7 +238,7 @@ def rank(nome):
         pass
     
     nomes = sorted(estrela, key=estrela.get,reverse=True)
-    print(estrela)
+    #print(estrela)
     
     while True:
         for evento in pygame.event.get():
@@ -237,17 +248,19 @@ def rank(nome):
                 if botaoVoltar.collidepoint(evento.pos):
                     menu(nome)
 
-        tela.fill(preto)        
-        botaoVoltar = pygame.draw.rect(tela, branco, (7,7,130,50),0,20)
+        tela.fill(preto)
+        tela.blit(fundoMenu,(0,0))
+        pygame.draw.rect(tela,preto,(60,50,450,520))
+        botaoVoltar = pygame.draw.rect(tela, branco, (5,615,130,50),0,20)
         textoVoltar = fonte.render("Voltar", True, preto)
-        tela.blit(textoVoltar,(10,5))
+        tela.blit(textoVoltar,(12,605))
         
-        posicaoY = 50
+        posicaoY = 60
         for quant,nome in enumerate(nomes):
-            if quant == 13:
+            if quant == 12:
                 break
             textoJogador = fonte.render(nome + " - "+str(estrela[nome]), True, branco)
-            tela.blit(textoJogador, (300,posicaoY))
+            tela.blit(textoJogador, (80,posicaoY))
             posicaoY = posicaoY + 40
 
         pygame.display.update()
