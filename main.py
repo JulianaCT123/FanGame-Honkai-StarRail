@@ -1,24 +1,26 @@
 import pygame, random, os, time
 from tkinter import simpledialog
 
+import pygame.rect
+
 pygame.init()
 
 tamanho = (1200,673)
 relogio = pygame.time.Clock()
 tela = pygame.display.set_mode(tamanho)
-icone = pygame.image.load("assetsHSR/stellePlayerRE.png")
+icone = pygame.image.load("assets/stellePlayerRE.png")
 pygame.display.set_icon(icone)
 pygame.display.set_caption("Bem-Vindo à Penacony!")
 
 # Chamando os assets ---------------------------------------------------
 
 # imagens:
-fundo = pygame.image.load("assetsHSR/fundoRE.png")
-fundoMenu = pygame.image.load("assetsHSR/fundoMenu.png")
-stelle = pygame.image.load("assetsHSR/stellePlayerRE.png")
-stelleMorreu = pygame.image.load("assetsHSR/stelleMorreu.png")
-birdskull = pygame.image.load("assetsHSR/BirdskullRE.png")
-memeAllSeer = pygame.image.load("assetsHSR/MemeAllseerRE.png")
+fundo = pygame.image.load("assets/fundoRE.png")
+fundoMenu = pygame.image.load("assets/fundoMenu.png")
+stelle = pygame.image.load("assets/stellePlayerRE.png")
+stelleMorreu = pygame.image.load("assets/stelleMorreu.png")
+birdskull = pygame.image.load("assets/BirdskullRE.png")
+memeAllSeer = pygame.image.load("assets/MemeAllseerRE.png")
 
 # Fontes:
 fonte = pygame.font.SysFont("comicsans",40)
@@ -26,9 +28,8 @@ fonteMiuda = pygame.font.SysFont("comicsans",20)
 fonteTitulo = pygame.font.SysFont("arial", 50)
 
 # Sons:
-pygame.mixer.music.load("assetsHSR/AceInTheHole.mp3")
-misselSom = pygame.mixer.Sound("assets/missile.wav")
-somStelleMorte = pygame.mixer.Sound("assetsHSR/stelleSomMorte.mp3")
+pygame.mixer.music.load("assets/AceInTheHole.mp3")
+somStelleMorte = pygame.mixer.Sound("assets/stelleSomMorte.mp3")
 # -----------------------------------------------------------------------
 bordaX = 1200
 bordaY = 673
@@ -36,12 +37,14 @@ bordaY = 673
 branco = (255,255,255)
 preto = (0,0,0)
 vermelho = (255,0,0)
+rosa = (200,100,255)
 
-nome = simpledialog.askstring("Bem-Vindo à Penacony!", "Insira um username: ")
+nome = "Anonimo"
+pygame.mixer.music.play(-1)
 
 def jogar(nome):
 
-    pygame.mixer.music.load("assetsHSR/AgainstTheDay.mp3")
+    pygame.mixer.music.load("assets/AgainstTheDay.mp3")
     pygame.mixer.music.play(-1) # Botando a musica pra tocar / -1 para tocar em loop
     #pygame.mixer.Sound.play(misselSom) # Tocando o som do missel 1vez ja q ele ja começa caindo
 
@@ -49,22 +52,17 @@ def jogar(nome):
     posicaoYpersona = 500
     movimentoXpersona = 0
     movimentoYpersona = 0
-    larguraPersona = 150
-    alturaPersona = 150
 
     posicaoXbird = 700
     posicaoYbird = -162
     velBird = 5
     alturaBird = 162
-    larguraBird = 200
 
     posicaoYmeme1 = -163
     posicaoXmeme1 = 400
     alturaMeme1 = 102
-    larguraMeme1 = 100
     velMeme1 = 10
 
-    dificuldade = 50
     pontos = 0
 
     while True:
@@ -80,15 +78,6 @@ def jogar(nome):
                 movimentoXpersona = 0
             elif evento.type == pygame.KEYUP and evento.key == pygame.K_LEFT:
                 movimentoXpersona = 0
-            # Controle do personagem eixo Y
-            #elif evento.type == pygame.KEYDOWN and evento.key == pygame.K_UP:
-            #    movimentoYpersona = - 10
-            #elif evento.type == pygame.KEYDOWN and evento.key == pygame.K_DOWN:
-            #    movimentoYpersona = + 10
-            #elif evento.type == pygame.KEYUP and evento.key == pygame.K_UP:
-            #    movimentoYpersona = 0
-            #elif evento.type == pygame.KEYUP and evento.key == pygame.K_DOWN:
-            #    movimentoYpersona = 0
         
         posicaoXpersona = posicaoXpersona + movimentoXpersona  
         posicaoYpersona = posicaoYpersona + movimentoYpersona
@@ -98,60 +87,51 @@ def jogar(nome):
             posicaoXpersona = - 20
         elif posicaoXpersona > bordaX - 130 :
             posicaoXpersona = bordaX - 140
+        # ---------------------------
         
-        #elif posicaoYpersona < 0:
-        #    posicaoYpersona = 10
-        #elif posicaoYpersona > 473:
-        #    posicaoYpersona = 463
-
         tela.fill(branco)
         tela.blit(fundo, (0,0))
+
         tela.blit(stelle,(posicaoXpersona,posicaoYpersona))
-       
+        stelleBox = pygame.Rect((posicaoXpersona + 40, posicaoYpersona + 60, 75, 80))
+
         # Config movimento inimigo ------------------------------
         posicaoYbird = posicaoYbird + velBird # Configura o inimigo caindo 
         if posicaoYbird > bordaY:
             posicaoYbird = - alturaBird
             posicaoXbird = random.randint(0,bordaX)
-            #pygame.mixer.Sound.play(misselSom)
             pontos = pontos + 1
-        tela.blit(birdskull, (posicaoXbird, posicaoYbird)) # Mostra o inimigo                        
-
+        tela.blit(birdskull, (posicaoXbird, posicaoYbird)) # Mostra o inimigo 
+        birdBoxFace = pygame.Rect((posicaoXbird + 78, posicaoYbird + 85, 43, 60))
+        birdBoxAsaE1 = pygame.Rect((posicaoXbird + 55, posicaoYbird + 90,30,15))
+        birdBoxAsaE2 = pygame.Rect((posicaoXbird + 40, posicaoYbird + 50,15,30))
+        birdBoxAsaE3 = pygame.Rect((posicaoXbird + 10, posicaoYbird + 5,20,20))
+        birdBoxAsaD1 = pygame.Rect((posicaoXbird + 125, posicaoYbird + 100,30,15))
+        birdBoxAsaD2 = pygame.Rect((posicaoXbird + 155, posicaoYbird + 70,15,30))
+        birdBoxAsaD3 = pygame.Rect((posicaoXbird +175, posicaoYbird + 30,15,30))                   
+    
         posicaoYmeme1 = posicaoYmeme1 + velMeme1
         if posicaoYmeme1 > bordaY:
             posicaoYmeme1 = - alturaMeme1
             posicaoXmeme1 = random.randint(0,bordaX)
             pontos = pontos + 1
         tela.blit(memeAllSeer, (posicaoXmeme1, posicaoYmeme1))
+        meme1Box = pygame.Rect((posicaoXmeme1 + 15,posicaoYmeme1 + 15,75,75))
         
-        # Mostra aos pontos
+        # Mostra os pontos
         texto = fonte.render(nome + " pontos:" + str(pontos), True, branco)
-        tela.blit(texto,(10,10))
-        # -------------------------------------------------------
-
-        # Config colisao -------------------------------------------
-        pixelsPersonaX = list(range(posicaoXpersona, posicaoXpersona + larguraPersona))
-        pixelsPersonaY = list(range(posicaoYpersona, posicaoXpersona + alturaPersona))
-        pixelBirdX = list(range(posicaoXbird, posicaoXbird + larguraBird))
-        pixelBirdY = list(range(posicaoYbird, posicaoYbird + alturaBird))
-        pixelMeme1X = list(range(posicaoXmeme1, posicaoXmeme1 + larguraMeme1))
-        pixelMeme1Y = list(range(posicaoYmeme1, posicaoYmeme1 + alturaMeme1))
-
-        #os.system('cls')
-        #print( len( list( set(pixelMisselY).intersection(set(pixelsPersonaY) ) ) ) )
-        if len( list( set( pixelBirdY).intersection (set(pixelsPersonaY)))) > dificuldade:
-            if len ( list ( set(pixelBirdX).intersection(set(pixelsPersonaX) ) ) ) > dificuldade:
-                dead(nome, pontos)
-            #else:
-                #print("Ainda vivo, mas por pouco!")
-
-        elif len( list( set( pixelMeme1Y ).intersection (set( pixelsPersonaY )) )) > dificuldade:
-            if len (list ( set( pixelMeme1X ).intersection(set( pixelsPersonaX )) )) > dificuldade:
-                dead(nome, pontos)
-        #else:
-            #print("Ainda vivo")
-
+        tela.blit(texto,(10,10))    
         
+        # Config colisao -------------------------------------------
+
+        if stelleBox.colliderect(meme1Box):
+            dead(nome,pontos)
+        elif stelleBox.colliderect(birdBoxFace):
+            dead(nome,pontos)
+        elif stelleBox.colliderect(birdBoxAsaE1) or stelleBox.colliderect(birdBoxAsaE2) or stelleBox.colliderect(birdBoxAsaE3):
+            dead(nome,pontos)
+        elif stelleBox.colliderect(birdBoxAsaD1) or stelleBox.colliderect(birdBoxAsaD2) or stelleBox.colliderect(birdBoxAsaD3):
+            dead(nome,pontos)
 
         # ------------------------------------------------------------------
         pygame.display.update()
@@ -199,9 +179,8 @@ def dead(nome, pontos):
             pygame.display.update()
             relogio.tick(60)
 
-def menu():
-    pygame.mixer.music.play(-1)
-    
+def menu(nome):
+        
     while True:            
             for evento in pygame.event.get():
                 if evento.type == pygame.QUIT:
@@ -211,33 +190,44 @@ def menu():
                     if botaoJogar.collidepoint(evento.pos):
                         jogar(nome)
                     elif botaoRank.collidepoint(evento.pos):
-                        rank()
+                        rank(nome)
+                    elif botaoUser.collidepoint(evento.pos):
+                        nome = simpledialog.askstring("Bem-Vindo à Penacony!", "Insira um username: ")
 
             tela.fill(branco)
             tela.blit(fundoMenu,(0,0))
-            textoTitulo = fonteTitulo.render("Bem Vindo à Penacony!", True, branco)
-            tela.blit(textoTitulo,(90,250))
-            botaoJogar = pygame.draw.rect(tela, branco, (100,400,400,50),0,20)
+            textoTitulo = fonteTitulo.render("Bem Vindo à Penacony!", True, branco, preto)
+            tela.blit(textoTitulo,(30,250))
+            botaoJogar = pygame.draw.rect(tela, branco, (90,340,400,50),0,20)
             textoJogar = fonte.render("Jogar", True, preto)
-            tela.blit(textoJogar,(250,390))
-            botaoRank = pygame.draw.rect(tela, branco,(7,615,170,50),0,20)
+            tela.blit(textoJogar,(240,330))
+            botaoRank = pygame.draw.rect(tela, branco,(5,615,170,50),0,20)
             textoRank = fonte.render("Ranking", True, preto)
-            tela.blit(textoRank,(20,605))
+            tela.blit(textoRank,(18,605))
+            botaoUser = pygame.draw.rect(tela, branco, (185,615,280,50),0,20)
+            textoUser = fonte.render("Trocar usuario", True, preto)
+            tela.blit(textoUser, (190,607))
+            if nome != "Anonimo":
+                textoNome = fonteMiuda.render("Usuario Atual: " + nome, True, branco)
+                tela.blit(textoNome, (10,0))
+            else:
+                textoNome = fonteMiuda.render("Sem usuario", True, branco)
+                tela.blit(textoNome, (10,0))
             
             pygame.display.update()
             relogio.tick(60)
 
-def rank():
-    estrelas = {}
+def rank(nome):
+    estrela = {}
     try:
         arquivo = open("historico.txt","r",encoding="utf-8" )
-        estrelas = eval(arquivo.read())
+        estrela = eval(arquivo.read())
         arquivo.close()
     except:
         pass
     
-    nomes = sorted(estrelas, key=estrelas.get,reverse=True)
-    print(estrelas)
+    nomes = sorted(estrela, key=estrela.get,reverse=True)
+    print(estrela)
     
     while True:
         for evento in pygame.event.get():
@@ -245,22 +235,22 @@ def rank():
                 quit()
             elif evento.type == pygame.MOUSEBUTTONDOWN:
                 if botaoVoltar.collidepoint(evento.pos):
-                    menu()
+                    menu(nome)
 
         tela.fill(preto)        
         botaoVoltar = pygame.draw.rect(tela, branco, (7,7,130,50),0,20)
         textoVoltar = fonte.render("Voltar", True, preto)
-        tela.blit(textoVoltar,(10,10))
+        tela.blit(textoVoltar,(10,5))
         
         posicaoY = 50
-        for key,nome in enumerate(nomes):
-            if key == 13:
+        for quant,nome in enumerate(nomes):
+            if quant == 13:
                 break
-            textoJogador = fonte.render(nome + " - "+str(estrelas[nome]), True, branco)
+            textoJogador = fonte.render(nome + " - "+str(estrela[nome]), True, branco)
             tela.blit(textoJogador, (300,posicaoY))
             posicaoY = posicaoY + 40
 
         pygame.display.update()
         relogio.tick(60)
   
-menu()
+menu(nome)
