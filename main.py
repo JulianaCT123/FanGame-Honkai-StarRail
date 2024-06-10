@@ -67,19 +67,46 @@ def jogar(nome):
 
     pontos = 0
 
-    while True:
+    birdVivo = True
+    meme1Vivo = True 
+
+    showAtk = False
+    inicioAtk = 0
+    duracaoAtk = 250
+    
+    cooldown = 3000
+
+    while True:        
+
         for evento in pygame.event.get():
             if evento.type == pygame.QUIT:
-                quit()
-            # Controle do personagem eixo X    
-            elif evento.type == pygame.KEYDOWN and evento.key == pygame.K_RIGHT:
+                quit()  
+            elif evento.type == pygame.KEYDOWN and evento.key == pygame.K_d:
                 movimentoXpersona = + 10
-            elif evento.type == pygame.KEYDOWN and evento.key == pygame.K_LEFT:
+            elif evento.type == pygame.KEYDOWN and evento.key == pygame.K_a:
                 movimentoXpersona = - 10
-            elif evento.type == pygame.KEYUP and evento.key == pygame.K_RIGHT:
+            elif evento.type == pygame.KEYUP and evento.key == pygame.K_d:
                 movimentoXpersona = 0
-            elif evento.type == pygame.KEYUP and evento.key == pygame.K_LEFT:
+            elif evento.type == pygame.KEYUP and evento.key == pygame.K_a:
                 movimentoXpersona = 0
+            elif evento.type == pygame.KEYDOWN:
+                if evento.key == pygame.K_w:
+                    showAtk = True 
+                    inicioAtk = pygame.time.get_ticks()
+                    if ataqueBox.colliderect(birdBoxFace):
+                        birdVivo = False
+                        birdMorte = pygame.time.get_ticks()
+                    elif ataqueBox.colliderect(meme1Box):
+                        meme1Vivo = False
+                        meme1Morte = pygame.time.get_ticks()
+
+        tela.fill(branco)
+        tela.blit(fundo, (0,0))
+        ataqueBox = pygame.Rect((posicaoXpersona + 30, posicaoYpersona - 30, 115, 50))
+        if showAtk:
+            pygame.draw.rect(tela,vermelho,ataqueBox)
+            if pygame.time.get_ticks() - inicioAtk > duracaoAtk:
+                showAtk = False
         
         posicaoXpersona = posicaoXpersona + movimentoXpersona  
         posicaoYpersona = posicaoYpersona + movimentoYpersona
@@ -91,18 +118,21 @@ def jogar(nome):
             posicaoXpersona = bordaX - 140
         # ---------------------------
         
-        tela.fill(branco)
-        tela.blit(fundo, (0,0))
-
-        tela.blit(stelle,(posicaoXpersona,posicaoYpersona))
         stelleBox = pygame.Rect((posicaoXpersona + 40, posicaoYpersona + 60, 75, 80))
-
+        tela.blit(stelle,(posicaoXpersona,posicaoYpersona))
         # Config movimento inimigo ------------------------------
-        posicaoYbird = posicaoYbird + velBird # Configura o inimigo caindo 
-        if posicaoYbird > bordaY:
+        
+        if birdVivo:
+            posicaoYbird = posicaoYbird + velBird # Configura o inimigo caindo 
+            if posicaoYbird > bordaY:
+                posicaoYbird = - alturaBird
+                posicaoXbird = random.randint(0,(bordaX - larguraBird))
+                pontos = pontos + 1
+        elif birdVivo == False:
             posicaoYbird = - alturaBird
             posicaoXbird = random.randint(0,(bordaX - larguraBird))
-            pontos = pontos + 1
+            if pygame.time.get_ticks() - birdMorte > cooldown:
+                birdVivo = True
         tela.blit(birdskull, (posicaoXbird, posicaoYbird)) # Mostra o inimigo 
         birdBoxFace = pygame.Rect((posicaoXbird + 78, posicaoYbird + 85, 43, 60))
         birdBoxAsaE1 = pygame.Rect((posicaoXbird + 55, posicaoYbird + 90,30,15))
@@ -110,13 +140,18 @@ def jogar(nome):
         birdBoxAsaE3 = pygame.Rect((posicaoXbird + 10, posicaoYbird + 5,20,20))
         birdBoxAsaD1 = pygame.Rect((posicaoXbird + 125, posicaoYbird + 100,30,15))
         birdBoxAsaD2 = pygame.Rect((posicaoXbird + 155, posicaoYbird + 70,15,30))
-        birdBoxAsaD3 = pygame.Rect((posicaoXbird +175, posicaoYbird + 30,15,30))                   
-    
-        posicaoYmeme1 = posicaoYmeme1 + velMeme1
-        if posicaoYmeme1 > bordaY:
+        birdBoxAsaD3 = pygame.Rect((posicaoXbird + 175, posicaoYbird + 30,15,30))
+        if meme1Vivo:
+            posicaoYmeme1 = posicaoYmeme1 + velMeme1
+            if posicaoYmeme1 > bordaY:
+                posicaoYmeme1 = - alturaMeme1
+                posicaoXmeme1 = random.randint(0,(bordaX - larguraMeme1))
+                pontos = pontos + 0.5
+        elif meme1Vivo == False:
             posicaoYmeme1 = - alturaMeme1
             posicaoXmeme1 = random.randint(0,(bordaX - larguraMeme1))
-            pontos = pontos + 1
+            if pygame.time.get_ticks() - meme1Morte > cooldown:
+                meme1Vivo = True
         tela.blit(memeAllSeer, (posicaoXmeme1, posicaoYmeme1))
         meme1Box = pygame.Rect((posicaoXmeme1 + 15,posicaoYmeme1 + 15,75,75))
         
@@ -189,14 +224,13 @@ def dead(nome, pontos):
             relogio.tick(60)
 
 def menu(nome):
-        
+    pygame.mixer.music.load("assets/AceInTheHole.mp3")
     while True:            
             for evento in pygame.event.get():
                 if evento.type == pygame.QUIT:
                     quit()
                 elif evento.type == pygame.MOUSEBUTTONDOWN:
-                    #print(evento.pos)
-                    
+                    #print(evento.pos)                    
                     if botaoJogar.collidepoint(evento.pos):
                         jogar(nome)
                     if nome != "Anonimo":

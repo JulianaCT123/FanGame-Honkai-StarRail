@@ -1,0 +1,1 @@
+{'Juliana': 9, 'Juzita': 26, 'Anonimo': 0}
